@@ -16,8 +16,6 @@ Spree::Api::OrdersController.class_eval do
 
     @order = Spree::Core::Importer::Order.import(order_user, import_params)
     @order.update(bill_address_id: params[:address_id], ship_address_id: params[:address_id])
-    @order.update!
-    @order.complete!
     respond_with(@order, default_template: :show, status: 201)
   end
 
