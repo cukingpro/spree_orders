@@ -19,4 +19,13 @@ Spree::Api::OrdersController.class_eval do
     respond_with(@order, default_template: :show, status: 201)
   end
 
+  def cancell
+    if @order.destroy
+      @status = [ { "messages" => "Your order was successfully canceled"}]
+    else
+      @status = [ { "messages" => "Your order was not successfully canceled"}]
+    end
+    render "spree/api/logger/log"
+  end
+
 end
