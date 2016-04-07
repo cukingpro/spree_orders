@@ -1,8 +1,7 @@
-Spree::PaypalController.class_eval do
-
-	skip_before_filter  :verify_authenticity_token
-
-	def express
+module Spree
+  class PaypalController < StoreController
+  	skip_before_filter  :verify_authenticity_token
+    def express
       order = current_order || raise(ActiveRecord::RecordNotFound)
       items = order.line_items.map(&method(:line_item))
 
@@ -21,8 +20,8 @@ Spree::PaypalController.class_eval do
           Name: adjustment.label,
           Quantity: 1,
           Amount: {
-            currencyID: "USD",
-            value: vnd_to_usd(adjustment.amount)
+            currencyID: order.currency,
+            value: adjustment.amount
           }
         }
       end
@@ -32,7 +31,9 @@ Spree::PaypalController.class_eval do
       begin
         pp_response = provider.set_express_checkout(pp_request)
         if pp_response.success?
-          redirect_to provider.express_checkout_url(pp_response, useraction: 'commit')
+        	@url = provider.express_checkout_url(pp_response, useraction: 'commit')
+        	render  status: 200, json: @url.to_json
+          # redirect_to provider.express_checkout_url(pp_response, useraction: 'commit')
         else
           flash[:error] = Spree.t('flash.generic_error', scope: 'paypal', reasons: pp_response.errors.map(&:long_message).join(" "))
           redirect_to checkout_state_path(:payment)
@@ -50,8 +51,7 @@ Spree::PaypalController.class_eval do
           token: params[:token],
           payer_id: params[:PayerID]
         }),
-        amount: vnd_to_usd(order.total),
-        #amount: 21000,
+        amount: order.total,
         payment_method: payment_method
       })
       order.next
@@ -59,16 +59,21 @@ Spree::PaypalController.class_eval do
         flash.notice = Spree.t(:order_processed_successfully)
         flash[:order_completed] = true
         session[:order_id] = nil
-        redirect_to completion_route(order)
+        # redirect_to completion_route(order)
+        # render  status: 200, json: "success".to_json
+        redirect_to "http://sheltered-stream-93214.herokuapp.com/#/main/confirm_order/reviewOrder"
       else
-        redirect_to checkout_state_path(order.state)
+      	redirect_to "http://sheltered-stream-93214.herokuapp.com/#/main/enter_infor"
+      	# render status: 200, json: "failed".to_json
+        # redirect_to checkout_state_path(order.state)
       end
     end
 
     def cancel
       flash[:notice] = Spree.t('flash.cancel', scope: 'paypal')
-      order = current_order || raise(ActiveRecord::RecordNotFound)
-      redirect_to checkout_state_path(order.state, paypal_cancel_token: params[:token])
+      # order = current_order || raise(ActiveRecord::RecordNotFound)
+      redirect_to "http://sheltered-stream-93214.herokuapp.com/#/main/enter_infor"
+      # redirect_to checkout_state_path(order.state, paypal_cancel_token: params[:token])
     end
 
     private
@@ -79,9 +84,8 @@ Spree::PaypalController.class_eval do
           Number: item.variant.sku,
           Quantity: item.quantity,
           Amount: {
-              currencyID: "USD",
-              value: vnd_to_usd(item.price)
-              #value: 21000
+              currencyID: item.order.currency,
+              value: item.price
           },
           ItemCategory: "Physical"
       }
@@ -91,7 +95,7 @@ Spree::PaypalController.class_eval do
       { SetExpressCheckoutRequestDetails: {
           InvoiceID: order.number,
           BuyerEmail: order.email,
-          ReturnURL: confirm_paypal_url(payment_method_id: params[:payment_method_id], utm_nooverride: 1),
+          ReturnURL: confirm_paypal_url(payment_method_id: params[:payment_method_id], order_number: params[:order_number], utm_nooverride: 1),
           CancelURL:  cancel_paypal_url,
           SolutionType: payment_method.preferred_solution.present? ? payment_method.preferred_solution : "Mark",
           LandingPage: payment_method.preferred_landing_page.present? ? payment_method.preferred_landing_page : "Billing",
@@ -117,35 +121,33 @@ Spree::PaypalController.class_eval do
       # This calculates the item sum based upon what is in the order total, but not for shipping
       # or tax.  This is the easiest way to determine what the items should cost, as that
       # functionality doesn't currently exist in Spree core
-      item_sum = vnd_to_usd(current_order.total) - shipment_sum - current_order.additional_tax_total
-      #item_sum = 21000 - shipment_sum - current_order.additional_tax_total
+      item_sum = current_order.total - shipment_sum - current_order.additional_tax_total
+
       if item_sum.zero?
         # Paypal does not support no items or a zero dollar ItemTotal
         # This results in the order summary being simply "Current purchase"
         {
           OrderTotal: {
-            currencyID: "USD",
-            #value: current_order.total
-            value: vnd_to_usd(current_order.total)
+            currencyID: current_order.currency,
+            value: current_order.total
           }
         }
       else
         {
           OrderTotal: {
-            currencyID: "USD",
-            value: vnd_to_usd(current_order.total)
-            #value: 21000
+            currencyID: current_order.currency,
+            value: current_order.total
           },
           ItemTotal: {
-            currencyID: "USD",
-            value: vnd_to_usd(item_sum)
+            currencyID: current_order.currency,
+            value: item_sum
           },
           ShippingTotal: {
-            currencyID: "USD",
+            currencyID: current_order.currency,
             value: shipment_sum,
           },
           TaxTotal: {
-            currencyID: "USD",
+            currencyID: current_order.currency,
             value: current_order.additional_tax_total
           },
           ShipToAddress: address_options,
@@ -179,11 +181,9 @@ Spree::PaypalController.class_eval do
       payment_method.preferred_solution.eql?('Sole')
     end
 
-    def vnd_to_usd(price)
-       return BigDecimal.new(price.to_i/20000)
-    end
-
     def current_order
     	Spree::Order.find_by(number: params[:order_number])
     end
+
+  end
 end

@@ -1,5 +1,7 @@
 Spree::Api::OrdersController.class_eval do
 
+  before_action :find_order, except: [:create, :mine, :current, :index, :update, :user_history_orders]
+
   def create
     authorize! :create, Spree::Order
     order_user = if @current_user_roles.include?('admin') && order_params[:user_id]
@@ -15,7 +17,6 @@ Spree::Api::OrdersController.class_eval do
     end
 
     @order = Spree::Core::Importer::Order.import(order_user, import_params)
-    @order.update(bill_address_id: params[:address_id], ship_address_id: params[:address_id])
     respond_with(@order, default_template: :show, status: 201)
   end
 
@@ -26,6 +27,11 @@ Spree::Api::OrdersController.class_eval do
       @status = [ { "messages" => "Your order was not successfully canceled"}]
     end
     render "spree/api/logger/log"
+  end
+
+  def user_history_orders
+    @orders = Spree::Order.user_history_orders(current_api_user)
+    respond_with(@orders, default_template: :index, status: 200)
   end
 
 end

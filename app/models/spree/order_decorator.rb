@@ -7,4 +7,9 @@ Spree::Order.class_eval do
   	self.completed_at = Time.current
   	self.save
   end
+
+  def self.user_history_orders(user)
+  	user.orders.where(shipment_state: "shipped")
+  end
+  
 end
