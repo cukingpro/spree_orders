@@ -1,6 +1,6 @@
 Spree::Api::OrdersController.class_eval do
 
-  before_action :find_order, except: [:create, :mine, :current, :index, :update, :user_history_orders]
+  before_action :find_order, except: [:create, :mine, :current, :index, :update, :user_history_orders, :user_next_orders]
 
   def create
     authorize! :create, Spree::Order
@@ -38,5 +38,5 @@ Spree::Api::OrdersController.class_eval do
     @orders = Spree::Order.user_next_orders(current_api_user)
     respond_with(@orders, default_template: :index, status: 200)
   end
-  
+
 end
