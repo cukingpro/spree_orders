@@ -21,7 +21,7 @@ module Spree
           Quantity: 1,
           Amount: {
             currencyID: order.currency,
-            value: adjustment.amount
+            value: vnd_to_usd(adjustment.amount)
           }
         }
       end
@@ -76,6 +76,8 @@ module Spree
       # redirect_to checkout_state_path(order.state, paypal_cancel_token: params[:token])
     end
 
+
+
     private
 
     def line_item(item)
@@ -84,8 +86,8 @@ module Spree
           Number: item.variant.sku,
           Quantity: item.quantity,
           Amount: {
-              currencyID: item.order.currency,
-              value: item.price
+              currencyID: "USD",
+              value: vnd_to_usd(item.price)
           },
           ItemCategory: "Physical"
       }
@@ -129,26 +131,26 @@ module Spree
         {
           OrderTotal: {
             currencyID: current_order.currency,
-            value: current_order.total
+            value: vnd_to_usd(current_order.total)
           }
         }
       else
         {
           OrderTotal: {
-            currencyID: current_order.currency,
-            value: current_order.total
+            currencyID: "USD",
+            value: vnd_to_usd(current_order.total)
           },
           ItemTotal: {
-            currencyID: current_order.currency,
-            value: item_sum
+            currencyID: "USD",
+            value: vnd_to_usd(item_sum)
           },
           ShippingTotal: {
-            currencyID: current_order.currency,
-            value: shipment_sum,
+            currencyID: "USD",
+            value: vnd_to_usd(shipment_sum),
           },
           TaxTotal: {
-            currencyID: current_order.currency,
-            value: current_order.additional_tax_total
+            currencyID: "USD",
+            value: vnd_to_usd(current_order.additional_tax_total)
           },
           ShipToAddress: address_options,
           PaymentDetailsItem: items,
@@ -183,6 +185,10 @@ module Spree
 
     def current_order
     	Spree::Order.find_by(number: params[:order_number])
+    end
+
+    def vnd_to_usd(price)
+       return BigDecimal.new(price/20000)
     end
 
   end
