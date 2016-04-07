@@ -11,5 +11,8 @@ Spree::Order.class_eval do
   def self.user_history_orders(user)
   	user.orders.where(shipment_state: "shipped")
   end
-  
+
+  def self.user_next_orders(user)
+    user.orders.where.not(shipment_state: "shipped")
+  end
 end

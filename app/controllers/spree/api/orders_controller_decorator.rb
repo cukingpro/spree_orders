@@ -34,4 +34,9 @@ Spree::Api::OrdersController.class_eval do
     respond_with(@orders, default_template: :index, status: 200)
   end
 
+  def user_next_orders
+    @orders = Spree::Order.user_next_orders(current_api_user)
+    respond_with(@orders, default_template: :index, status: 200)
+  end
+  
 end
