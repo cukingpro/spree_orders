@@ -101,16 +101,13 @@ module Spree
         def confirm_add_fund
           user = current_api_user
           user.balance += params[:amount].to_i
-          if user.save 
-            render  status: 200, json: "success".to_json
-          else
-            render  status: 200, json: "failed".to_json
-          end
+          user.save 
+          redirect_to "http://sheltered-stream-93214.herokuapp.com/#/main/enter_infor"
         end
 
         def cancel_add_fund
           flash[:notice] = Spree.t('flash.cancel', scope: 'paypal')
-          redirect_to ""
+          redirect_to "http://sheltered-stream-93214.herokuapp.com/#/main/enter_infor"
         end
 
       end
