@@ -13,6 +13,8 @@ Spree::Core::Engine.routes.draw do
 
     get '/user_history_orders/', :to => "/spree/api/orders#user_history_orders"
     get '/user_next_orders/', :to => "/spree/api/orders#user_next_orders"
+
+    post '/shipments/split/', :to => "/spree/api/shipments#split"
     
   end
 end
