@@ -15,6 +15,10 @@ module SpreeOrders
       end
     end
 
+    initializer "spree.spree_orders.payment_methods", :after => "spree.register.payment_methods" do |app|
+      app.config.spree.payment_methods << Spree::PaymentMethod::Prepaid
+    end
+
     config.to_prepare &method(:activate).to_proc
   end
 end
