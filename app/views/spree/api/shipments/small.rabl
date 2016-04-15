@@ -14,7 +14,7 @@ child :selected_shipping_rate => :selected_shipping_rate do
 end
 
 child :shipping_methods => :shipping_methods do
-  attributes :id, :name
+  attributes :id, :code, :name
   child :zones => :zones do
     attributes :id, :name, :description
   end
@@ -25,9 +25,13 @@ child :shipping_methods => :shipping_methods do
 end
 
 child :manifest => :manifest do
-  child :variant => :variant do
-    extends "spree/api/v1/variants/small"
+  glue(:variant) do
+    attribute :id => :variant_id
   end
   node(:quantity) { |m| m.quantity }
   node(:states) { |m| m.states }
+end
+
+child :adjustments => :adjustments do
+  extends "spree/api/v1/adjustments/show"
 end
