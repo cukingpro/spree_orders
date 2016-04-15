@@ -8,7 +8,7 @@ module Spree
       def pay_now
         order = current_order || raise(ActiveRecord::RecordNotFound)
         # session[:order_number] = current_order.number
-        invoice = order.place_bitpay_order(notificationURL: api_bitpay_notification_url, redirectURL: "http://sheltered-stream-93214.herokuapp.com/#/main/confirm_order/reviewOrder")
+        invoice = order.place_bitpay_order(notificationURL: api_bitpay_notification_url, notificationEmail: "tongnguyen.hahuy@gmail.com", redirectURL: root_path)
         @invoice_iframe_url = "#{invoice['url']}&view=iframe"
         render json: @invoice_iframe_url.to_json
       end
