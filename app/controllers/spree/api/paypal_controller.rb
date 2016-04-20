@@ -62,9 +62,9 @@ module Spree
           session[:order_id] = nil
           # redirect_to completion_route(order)
           # render  status: 200, json: "success".to_json
-          redirect_to "http://sheltered-stream-93214.herokuapp.com/#/main/confirm_order/reviewOrder"
+          redirect_to DOMAIN
         else
-          redirect_to "http://sheltered-stream-93214.herokuapp.com/#/main/enter_infor"
+          redirect_to DOMAIN
           # render status: 200, json: "failed".to_json
           # redirect_to checkout_state_path(order.state)
         end
@@ -73,7 +73,7 @@ module Spree
       def cancel
         flash[:notice] = Spree.t('flash.cancel', scope: 'paypal')
         # order = current_order || raise(ActiveRecord::RecordNotFound)
-        redirect_to "http://sheltered-stream-93214.herokuapp.com/#/main/enter_infor"
+        redirect_to DOMAIN
         # redirect_to checkout_state_path(order.state, paypal_cancel_token: params[:token])
       end
 
@@ -100,14 +100,14 @@ module Spree
 
         def confirm_add_fund
           user = current_api_user
-          user.balance += params[:amount].to_i
+          user.add_fund(params[:amount].to_i)
           user.save 
-          redirect_to "http://sheltered-stream-93214.herokuapp.com/#/main/enter_infor"
+          redirect_to DOMAIN
         end
 
         def cancel_add_fund
           flash[:notice] = Spree.t('flash.cancel', scope: 'paypal')
-          redirect_to "http://sheltered-stream-93214.herokuapp.com/#/main/enter_infor"
+          redirect_to DOMAIN
         end
 
       end
