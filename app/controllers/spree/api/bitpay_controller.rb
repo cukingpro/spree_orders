@@ -2,7 +2,6 @@ module Spree
   module Api
     class BitpayController < StoreController
       skip_before_filter :verify_authenticity_token
-
       # Generates Bitpay Invoice and returns iframe view
       #
       def pay_now
@@ -80,6 +79,31 @@ module Spree
         redirect_to (request.referrer || root_path), notice: notice
       end
 
+      # Add fund to balance
+      # 
+      def add_fund
+        invoice = Spree::PaymentMethod::BitPayment.first.create_invoice(add_fund_params)
+        p invoice
+        p invoice[:posData]
+        p invoice['url']
+        @invoice_url = "#{invoice['url']}"
+        render json: @invoice_url.to_json
+      end
+
+      def add_fund_notification
+        # p 123
+        # params[:posData]
+        # p JSON.parse(params["posData"])
+        posData = JSON.parse(params["posData"])
+        p posData
+        user = Spree::User.find(posData["user_id"].to_i)
+        p user.balance
+        user.add_fund(posData["price"].to_i)
+        p user
+        p user.balance
+        user.save
+      end
+
       #####
       def current_api_user
         Spree::User.find_by(spree_api_key: api_key.to_s)
@@ -91,6 +115,24 @@ module Spree
 
       def current_order
         Spree::Order.find_by(number: params[:order_number])
+      end
+
+      def add_fund_params
+        {
+          price: params[:amount],
+          currency: "VND",
+          notificationURL: api_bitpay_add_fund_notification_url,
+          redirectURL: DOMAIN,
+          posData: posDataJson,
+          fullNotifications: true
+        }
+      end
+
+      def posDataJson
+        {
+          user_id: current_api_user.id,
+          price: params[:amount]
+        }.to_json
       end
 
     end
