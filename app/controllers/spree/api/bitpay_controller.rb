@@ -83,25 +83,15 @@ module Spree
       # 
       def add_fund
         invoice = Spree::PaymentMethod::BitPayment.first.create_invoice(add_fund_params)
-        p invoice
-        p invoice[:posData]
-        p invoice['url']
         @invoice_url = "#{invoice['url']}"
         render json: @invoice_url.to_json
       end
 
       def add_fund_notification
-        # p 123
-        # params[:posData]
-        # p JSON.parse(params["posData"])
         posData = JSON.parse(params["posData"])
-        p posData
         user = Spree::User.find(posData["user_id"].to_i)
-        p user.balance
         user.add_fund(posData["price"].to_i)
-        p user
-        p user.balance
-        user.save
+        head :ok if user.save
       end
 
       #####
