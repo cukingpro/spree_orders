@@ -21,6 +21,8 @@ Spree::Core::Engine.routes.draw do
     get '/spree_bitpay/refresh', :to => "bitpay#refresh", :as => :bitpay_refresh
     get '/spree_bitpay/check', :to => "bitpay#check_payment_state", :as => :bitpay_check
     post '/spree_bitpay/notification', :to => "bitpay#notification", :as => :bitpay_notification
+    post '/spree_bitpay/add_fund', :to => "bitpay#add_fund", :as => :bitpay_add_fund
+    post '/spree_bitpay/add_fund_notification', :to => "bitpay#add_fund_notification", :as => :bitpay_add_fund_notification
 
     get '/user_history_orders/', :to => "/spree/api/orders#user_history_orders"
     get '/user_next_orders/', :to => "/spree/api/orders#user_next_orders"
