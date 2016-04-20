@@ -17,6 +17,12 @@ Spree::Order.class_eval do
   end
 
   def group_by_date
-    self.shipments.group_by{ |s| s[:date_delivery]}
+    self.shipments.group_by{ |s| s[:date_delivery] }.map do |k,v|
+      {
+        date_delivery: k,
+        shipments: v
+      }
+    end
   end
+
 end
