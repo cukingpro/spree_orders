@@ -1,7 +1,7 @@
 object @shipment
 
 attributes *shipment_attributes, :date_delivery
-node(:time_frame) { |shipment| shipment.time_frame.name }
+child(:time_frame) { attributes :id, :name }
 
 child :manifest => :manifest do
   child :variant => :variant do
