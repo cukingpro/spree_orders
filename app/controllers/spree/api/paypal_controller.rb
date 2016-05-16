@@ -64,7 +64,7 @@ module Spree
           # render  status: 200, json: "success".to_json
           redirect_to DOMAIN+"/confirm_order/reviewOrder"
         else
-          redirect_to DOMAIN
+          redirect_to DOMAIN+"/redirect"
           # render status: 200, json: "failed".to_json
           # redirect_to checkout_state_path(order.state)
         end
