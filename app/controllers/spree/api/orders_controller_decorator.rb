@@ -22,9 +22,9 @@ Spree::Api::OrdersController.class_eval do
 
   def cancell
     if @order.destroy
-      @status = [ { "messages" => "Your order was successfully canceled"}]
+      @status = [ { "messages" => "Your order was successfully canceled" }]
     else
-      @status = [ { "messages" => "Your order was not successfully canceled"}]
+      @status = [ { "messages" => "Your order was not successfully canceled" }]
     end
     render "spree/api/logger/log"
   end
