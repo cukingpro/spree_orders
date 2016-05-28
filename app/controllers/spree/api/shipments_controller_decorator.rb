@@ -16,10 +16,22 @@ Spree::Api::ShipmentsController.class_eval do
     		quantity = li[:quantity].to_i
     		# order.contents.add(variant, quantity, {shipment: shipment})
     		original_shipment.transfer_to_shipment(variant, quantity, shipment)
+            shipment.address = original_shipment.address
+
     	end
     end
     original_shipment.destroy!
     render json: {success: true, message: Spree.t(:shipment_transfer_success)}, status: 201
+  end
+
+  def show
+    @shipment = Spree::Shipment.find(params[:id])
+    render "spree/api/shipments/show_mobile"
+  end
+
+  def available_shipments
+    @shipments = Spree::Shipment.available_shipments
+    render "spree/api/shipments/index_mobile"
   end
 
   

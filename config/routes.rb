@@ -28,5 +28,9 @@ Spree::Core::Engine.routes.draw do
     get '/user_next_orders/', :to => "/spree/api/orders#user_next_orders"
     post '/shipments/split/', :to => "/spree/api/shipments#split"
 
+    #deliverer and shipment
+    #
+    get '/available_shipments/', :to => "/spree/api/shipments#available_shipments"
+    get '/shipments/:id/', :to => "/spree/api/shipments#show"
   end
 end
