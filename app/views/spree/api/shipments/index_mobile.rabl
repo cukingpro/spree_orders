@@ -1,3 +1,3 @@
 collection @shipments
 
-extends "spree/api/shipments/simple"
+extends "spree/api/shipments/show_mobile"
