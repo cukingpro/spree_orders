@@ -34,6 +34,11 @@ Spree::Api::ShipmentsController.class_eval do
     render "spree/api/shipments/index_mobile"
   end
 
+  def deliverer_shipments
+    @shipments = Spree::Shipment.date(Date.today).deliverer(current_user_id)
+    render "spree/api/shipments/index_mobile"
+  end
+
   
 
 end
