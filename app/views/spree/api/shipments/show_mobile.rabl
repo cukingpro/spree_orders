@@ -2,6 +2,10 @@ object @shipment
 
 attributes *shipment_attributes, :date_delivery
 node(:time_frame) { |shipment| shipment.time_frame.name }
+node(:amount) { |shipment| shipment.amount }
+child(:order => :user) do 
+	glue(:user) { extends "spree/api/users/show_mobile" }
+end
 child(:address) { extends "spree/api/addresses/show" }
 child :manifest => :manifest do
   child :variant => :product do
