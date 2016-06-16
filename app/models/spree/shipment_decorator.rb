@@ -62,7 +62,7 @@ Spree::Shipment.class_eval do
   end
 
   def determine_state(order)
-    return 'ready' if order.payments.first.payment_method.name == 'Check'
+    return 'ready' if order.payments.first.payment_method.name == 'Cash'
     return 'canceled' if order.canceled?
     return 'pending' unless order.can_ship?
     return 'pending' if inventory_units.any? &:backordered?
@@ -78,7 +78,7 @@ Spree::Shipment.class_eval do
 
   def after_ship
   	Spree::ShipmentHandler.factory(self).perform
-  	if (self.order.payments.first.payment_method.name == 'Check')
+  	if (self.order.payments.first.payment_method.name == 'Cash')
   		d = self.deliverer
   		d.balance += self.amount
   		d.save
